@@ -10,5 +10,5 @@ In progress
 - [ ] Login/Logout
 - [ ] Task completion
 - [ ] User registration
-- [ ] Token-Based authentication (not sure about this)
+- [ ] Token-Based authentication (no idea)
 - [ ] User data protection
