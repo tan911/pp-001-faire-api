@@ -1,0 +1,47 @@
+{
+  "name": "pp-001-faire",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist && npx tsc",
+    "preserve": "npm run build",
+    "serve": "concurrently \"npx tsc -w\" \"nodemon --config src/config/nodemon.json dist/app.js\"",
+    "lint": "eslint . --config .eslintrc.json",
+    "lint:fix": "eslint . --fix --config .eslintrc.json"
+  },
+  "keywords": [
+    "Nodejs",
+    "typescript",
+    "express"
+  ],
+  "author": "Jovan Lanutan",
+  "license": "ISC",
+  "dependencies": {
+    "@types/morgan": "^1.9.4",
+    "body-parser": "^1.20.2",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "rimraf": "^5.0.1",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.10",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-standard-with-typescript": "^37.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
