@@ -6,14 +6,16 @@
   "scripts": {
     "build": "rimraf dist && npx tsc",
     "preserve": "npm run build",
-    "serve": "concurrently \"npx tsc -w\" \"nodemon --config src/config/nodemon.json dist/app.js\"",
+    "serve": "concurrently \"npx tsc -w\" \"nodemon --config src/config/nodemon.json src/app.ts\"",
     "lint": "eslint . --config .eslintrc.json",
     "lint:fix": "eslint . --fix --config .eslintrc.json"
   },
   "keywords": [
     "Nodejs",
     "typescript",
-    "express"
+    "express",
+    "querybulder",
+    "database"
   ],
   "author": "Jovan Lanutan",
   "license": "ISC",
@@ -24,6 +26,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "morgan": "^1.10.0",
+    "mysql2": "^3.6.0",
     "rimraf": "^5.0.1",
     "winston": "^3.10.0"
   },
