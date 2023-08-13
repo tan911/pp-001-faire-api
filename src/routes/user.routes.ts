@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
-import { getTask } from '../controllers/user.controllers';
+import { getUser } from '../controllers/user.controllers';
 
-const userRouter: Router = Router();
+const router: Router = Router();
 
-userRouter.route('/').get(getTask);
+router.route('/').get(getUser);
 
-export { userRouter };
+export default router;
