@@ -9,7 +9,7 @@ interface UserInfo {
   updated_at: Date;
 }
 
-async function getUserInfo(): Promise<UserInfo> {
+export async function getUserInfo(): Promise<UserInfo> {
   try {
     const response = await query('SELECT * FROM account');
     return response;
@@ -17,5 +17,3 @@ async function getUserInfo(): Promise<UserInfo> {
     throw new ErrorHandler('An error occured', 400);
   }
 }
-
-export { getUserInfo };
