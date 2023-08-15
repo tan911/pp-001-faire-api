@@ -24,8 +24,10 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/faire/user', userRouter);
 
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
-  next(new ErrorHandler(`Cant't find ${req.originalUrl} on this server`, 404));
+app.all('*', (err: Error, req: Request, res: Response, next: NextFunction) => {
+  next(
+    new ErrorHandler(`Cant't find ${req.originalUrl} on this server`, err, 404),
+  );
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +39,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.listen(port, () => {
   console.log(
-    `Server running on: ${chalk.bold.cyan(`http://localhost/${port}`)}`,
+    `Server running on: \t\t${chalk.bold.cyan(`http://localhost/${port}`)}`,
   );
 });

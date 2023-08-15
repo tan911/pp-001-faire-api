@@ -1,12 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { getUserInfo } from '../models/user.model';
+import { createUserData, getUserData } from '../models/user.model';
 import asyncWrapper from '../utils/async-error.util';
 
-export const getUser = asyncWrapper(
+export const createUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = await getUserInfo();
-    res.status(200).json({
+    const data = await createUserData({
+      activityId: req.body.activityId,
+      title: req.body.title,
+      description: req.body.description,
+    });
+    res.status(201).json({
       status: 'success',
       data: {
         data,
@@ -15,21 +19,14 @@ export const getUser = asyncWrapper(
   },
 );
 
-// export function getUser(req: Request, res: Response): void {
-//   void (async function (): Promise<void> {
-//     try {
-//       const data = await getUserInfo();
-//       res.status(200).json({
-//         status: 'success',
-//         data: {
-//           data,
-//         },
-//       });
-//     } catch (err) {
-//       res.status(400).json({
-//         status: 'Fail',
-//         message: err,
-//       });
-//     }
-//   })();
-// }
+export const getUserTask = asyncWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = await getUserData(req.params.id);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data,
+      },
+    });
+  },
+);
