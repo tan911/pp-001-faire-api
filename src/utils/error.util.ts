@@ -1,12 +1,10 @@
-class ErrorHandler extends Error {
+export class ErrorHandler extends Error {
   statusCode: number;
   status: string;
   isOperational: boolean;
-  error: unknown;
 
-  constructor(message: string, error: unknown, statusCode: number) {
+  constructor(message: string, statusCode: number) {
     super(message);
-    this.error = error;
     this.statusCode = statusCode;
     this.status = `${this.statusCode}`.startsWith('4') ? 'fail' : 'error';
     this.isOperational = true;
@@ -15,4 +13,12 @@ class ErrorHandler extends Error {
   }
 }
 
-export default ErrorHandler;
+export class PageNotFound extends ErrorHandler {
+  url: string;
+
+  constructor(url: string) {
+    super(`Can't find this ${url} on server`, 404);
+
+    this.url = url;
+  }
+}

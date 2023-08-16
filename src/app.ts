@@ -5,7 +5,7 @@ import chalk from 'chalk';
 
 import userRouter from './routes/user.routes';
 import logger from './middlewares/logger.middleware';
-import ErrorHandler from './utils/error.util';
+import { PageNotFound } from './utils/error.util';
 
 const app: Express = express();
 
@@ -15,24 +15,15 @@ app.use(logger);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'home',
-  });
-});
-
 app.use('/faire/user', userRouter);
 
-app.all('*', (err: Error, req: Request, res: Response, next: NextFunction) => {
-  next(
-    new ErrorHandler(`Cant't find ${req.originalUrl} on this server`, err, 404),
-  );
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new PageNotFound(req.originalUrl));
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
-    stats: 'fail',
+    status: 'fail',
     message: err.message,
   });
 });

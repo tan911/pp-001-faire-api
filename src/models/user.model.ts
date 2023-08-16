@@ -1,5 +1,5 @@
 import { query } from '../utils/query.util';
-import ErrorHandler from '../utils/error.util';
+import { ErrorHandler } from '../utils/error.util';
 
 interface Task {
   activityId: string;
@@ -10,11 +10,11 @@ interface Task {
 export async function createUserData(task: Task): Promise<Task> {
   try {
     const response = await query(`
-     INSERT INTO user_activities (activity_id, title, description) 
+     INSERT INTO user_activities (activity_id, title, description)
       VALUES ('${task.activityId}', '${task.title}', '${task.description}')`);
     return response;
   } catch (err) {
-    throw new ErrorHandler('An error occured when creating a task', err, 500);
+    throw new ErrorHandler('An error occured when creating a task', 500);
   }
 }
 
@@ -25,6 +25,6 @@ export async function getUserData(id: string): Promise<Task> {
     `);
     return response[0];
   } catch (err) {
-    throw new ErrorHandler('An error occured when getting a task', err, 500);
+    throw new ErrorHandler('An error occured when getting a task', 500);
   }
 }
