@@ -20,7 +20,7 @@ export const signup = asyncWrapper(
     });
 
     const newUser = await schema.validateAsync(req.body);
-    console.log(newUser);
+
     await createUser(newUser);
 
     res.status(201).json({

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && npx tsc",
+    "build": "rimraf dist && rimraf logger && npx tsc",
     "preserve": "npm run build",
     "serve": "concurrently \"npx tsc -w\" \"nodemon --config src/config/nodemon.json src/app.ts\"",
     "lint": "eslint . --config .eslintrc.json",
@@ -29,7 +29,8 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.6.0",
     "rimraf": "^5.0.1",
-    "winston": "^3.10.0"
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

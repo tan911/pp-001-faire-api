@@ -1,41 +1,30 @@
-import winston from 'winston';
-// import chalk from 'chalk';
+import winston, { createLogger } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
-const level = (): string => {
-  const env = process.env.NODE_ENV ?? 'development';
-  const isDevelopment = env === 'development';
-  return isDevelopment ? 'debug' : 'warn';
-};
-
-const colors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'blue',
-  debug: 'white',
-};
-
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-};
-
-winston.addColors(colors);
-
-const Logger = winston.createLogger({
-  level: level(),
-  levels,
+const logger = createLogger({
+  level: 'verbose',
+  handleExceptions: true,
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.colorize({ all: true }),
+    winston.format.colorize(),
+    winston.format.timestamp({
+      format: 'YYYY-MM-DD HH-mm-ss',
+    }),
+    winston.format.errors({ stack: true }),
+    winston.format.json(),
     winston.format.printf(
-      info => `${info.timestamp} [${info.level}]: ${info.message}`,
+      ({ timestamp, level, message }) =>
+        // eslint-disable-next-line
+        `${timestamp} ${level}: ${message}`,
     ),
   ),
-  transports: [new winston.transports.Console()],
+  transports: [
+    new DailyRotateFile({
+      filename: 'logger/logs/%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+    }),
+    new winston.transports.Console(),
+  ],
+  exitOnError: false,
 });
 
-export default Logger;
+export default logger;

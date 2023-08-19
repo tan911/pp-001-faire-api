@@ -2,10 +2,12 @@ export class ErrorHandler extends Error {
   statusCode: number;
   status: string;
   isOperational: boolean;
+  error: unknown;
 
-  constructor(message: string, statusCode: number) {
+  constructor(message: string, statusCode: number, error?: unknown) {
     super(message);
     this.statusCode = statusCode;
+    this.error = error;
     this.status = `${this.statusCode}`.startsWith('4') ? 'fail' : 'error';
     this.isOperational = true;
 

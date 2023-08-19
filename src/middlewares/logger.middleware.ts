@@ -1,21 +1,21 @@
 import morgan, { StreamOptions } from 'morgan';
-import Logger from '../config/logger.config';
+import { Request, Response } from 'express';
+import logger from '../config/logger.config';
 
 const stream: StreamOptions = {
-  write: message => Logger.http(message),
+  write: message => logger.http(message),
 };
 
-const skip = (): boolean => {
-  const env = process.env.NODE_ENV ?? 'development';
-  return env !== 'development';
+const morganFormat: string =
+  process.env.NODE_ENV !== 'production' ? 'dev' : 'combined';
+
+const skip = (req: Request, res: Response): boolean => {
+  return res.statusCode < 400;
 };
 
-const morganMiddleWare = morgan(
-  ':method :url :status :res[content-length] - :response-time ms',
-  {
-    stream,
-    skip,
-  },
-);
+const method = morgan(morganFormat, {
+  skip,
+  stream,
+});
 
-export default morganMiddleWare;
+export default method;

@@ -7,7 +7,6 @@ interface User {
   username: string;
   email: string;
   password: string;
-  password_confirm: string;
 }
 
 export async function createUser(info: User): Promise<void> {
@@ -16,6 +15,6 @@ export async function createUser(info: User): Promise<void> {
 			VALUES (${info.id}, '${info.activityId}', '${info.username}', '${info.email}', '${info.password}')
 		`);
   } catch (err) {
-    throw new ErrorHandler('An error occured when creating a user', 500);
+    throw new ErrorHandler('An error occured when creating a user', 500, err);
   }
 }
