@@ -1,11 +1,12 @@
 import { ErrorHandler } from '../utils/error.util';
+import logger from './logger.config';
 
 process.on('unhandledRejection', (error: Error) => {
-  console.log(`Unhandled Rejection: ${error.message}`);
+  logger.error(`Unhandled Rejection: ${error.message}`);
   throw new Error(error.message);
 });
 
 process.on('uncaughtException', (error: Error) => {
-  console.log(`Uncaught Exception: ${error.message}`);
+  logger.error(`Uncaught Exception: ${error.message}`);
   throw new ErrorHandler(error.message, 500);
 });

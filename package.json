@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && rimraf logger && npx tsc",
+    "build": "rimraf dist logger && npx tsc",
     "preserve": "npm run build",
-    "serve": "concurrently \"npx tsc -w\" \"nodemon --config src/config/nodemon.json src/app.ts\"",
+    "serve": "concurrently \"npx tsc -w\" \"nodemon --config nodemon.json src/app.ts\"",
     "lint": "eslint . --config .eslintrc.json",
     "lint:fix": "eslint . --fix --config .eslintrc.json"
   },
@@ -15,17 +15,22 @@
     "typescript",
     "express",
     "querybulder",
-    "database"
+    "database",
+    "mysql"
   ],
   "author": "Jovan Lanutan",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/morgan": "^1.9.4",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "chalk": "^4.1.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "joi": "^17.9.2",
+    "jsonwebtoken": "^9.0.1",
     "morgan": "^1.10.0",
     "mysql2": "^3.6.0",
     "rimraf": "^5.0.1",

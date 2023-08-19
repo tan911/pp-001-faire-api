@@ -19,12 +19,19 @@ export const signup = asyncWrapper(
       password_confirm: Joi.ref('password'),
     });
 
-    const newUser = await schema.validateAsync(req.body);
+    const request = await schema.validateAsync(req.body);
 
-    await createUser(newUser);
+    const token = await createUser({
+      id: request.id,
+      activityId: request.activityId,
+      username: request.username,
+      email: request.email,
+      password: request.password,
+    });
 
     res.status(201).json({
       status: 'success',
+      token,
       message: 'user created!',
     });
   },
