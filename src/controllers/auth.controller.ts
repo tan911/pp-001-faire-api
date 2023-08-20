@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
-import { createUser } from '../models/user.model';
+import { checkUser, createUser } from '../models/user.model';
 import asyncWrapper from '../utils/async-error.util';
 
 export const signup = asyncWrapper(
@@ -11,11 +11,13 @@ export const signup = asyncWrapper(
       id: Joi.number().optional(),
       activityId: Joi.string().optional(),
       username: Joi.string().min(3).max(30).required(),
-      email: Joi.string().email({
-        minDomainSegments: 2,
-        tlds: { allow: ['com', 'to', 'net'] },
-      }),
-      password: Joi.string(),
+      email: Joi.string()
+        .email({
+          minDomainSegments: 2,
+          tlds: { allow: ['com', 'to', 'net'] },
+        })
+        .required(),
+      password: Joi.string().required(),
       password_confirm: Joi.ref('password'),
     });
 
@@ -33,6 +35,33 @@ export const signup = asyncWrapper(
       status: 'success',
       token,
       message: 'user created!',
+    });
+  },
+);
+
+export const login = asyncWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+      email: Joi.string()
+        .email({
+          minDomainSegments: 2,
+          tlds: { allow: ['com', 'to', 'net'] },
+        })
+        .required(),
+      password: Joi.string().required(),
+    });
+
+    const request = await schema.validateAsync(req.body);
+
+    const token = await checkUser({
+      email: request.email as string,
+      password: request.password as string,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      token,
+      message: 'Login!',
     });
   },
 );

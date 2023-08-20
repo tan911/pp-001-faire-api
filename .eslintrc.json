@@ -17,7 +17,7 @@
   },
   "rules": {
     "prettier/prettier": ["error", { "endOfLine": "auto" }],
-    "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/strict-boolean-expressions": "error",
     "@typescript-eslint/restrict-template-expressions": "error",
     "@typescript-eslint/consistent-type-imports": "off",
     "@typescript-eslint/no-unused-vars": "error",
@@ -31,7 +31,7 @@
     "no-param-reassign": "off",
     "no-return-await": "off",
     "no-underscore-dangle": "off",
-    "prefer-destructuring": ["error", { "object": true, "array": false }],
-    "no-unused-vars": ["off", { "argsIgnorePattern": "req|res|next|val" }]
+    "prefer-destructuring": ["error", { "object": true, "array": false }]
+    // "no-unused-vars": ["off", { "argsIgnorePattern": "req|res|next|val" }]
   }
 }
