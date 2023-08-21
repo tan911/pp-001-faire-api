@@ -72,7 +72,7 @@ export const auth = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // Check token
     const isHeader: string | undefined = req.get('authorization');
-    const isAuthorize = isHeader?.startsWith('Bearer') ?? false;
+    const isAuthorize: boolean = isHeader?.startsWith('Bearer') ?? false;
 
     let token: string | undefined;
 
