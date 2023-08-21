@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import Joi from 'joi';
 
 import {
   createTask,
@@ -10,21 +11,41 @@ import asyncWrapper from '../utils/async-error.util';
 
 export const createUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    await createTask({
-      activityId: req.body.activityId,
-      title: req.body.title,
-      description: req.body.description,
+    const schema = Joi.object({
+      id: Joi.string().required(),
+      title: Joi.string().min(5).max(25).required(),
+      description: Joi.string().max(30).required(),
+      status: Joi.string().required(),
     });
+
+    const request = await schema.validateAsync(req.body);
+
+    await createTask({
+      id: request.id,
+      title: request.title,
+      description: request.description,
+      status: request.status,
+    });
+
     res.status(201).json({
       status: 'success',
-      message: 'Task created!',
+      message: 'Task successfully created!',
     });
   },
 );
 
 export const getUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = await getTask(req.params.id);
+    const schema = Joi.object({
+      id: Joi.string().required(),
+    });
+
+    const userTask = await schema.validateAsync(req.params);
+
+    const data = await getTask({
+      id: userTask.id,
+    });
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -36,10 +57,20 @@ export const getUserTask = asyncWrapper(
 
 export const updateUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+      id: Joi.string().required(),
+      title: Joi.string().min(5).max(25).required(),
+      description: Joi.string().max(30).required(),
+      status: Joi.string().required(),
+    });
+
+    const request = await schema.validateAsync(req.body);
+
     await updateTask({
-      activityId: req.body.activityId,
-      title: req.body.title,
-      description: req.body.description,
+      id: request.id,
+      title: request.title,
+      description: request.description,
+      status: request.status,
     });
 
     res.status(200).json({
@@ -51,7 +82,15 @@ export const updateUserTask = asyncWrapper(
 
 export const deleteUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    await deleteTask(req.params.id);
+    const schema = Joi.object({
+      id: Joi.string().required(),
+    });
+
+    const user = await schema.validateAsync(req.params);
+
+    await deleteTask({
+      id: user.id,
+    });
 
     res.status(204).json({
       status: 'success',

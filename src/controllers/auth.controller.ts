@@ -2,14 +2,16 @@ import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
 import { checkUser, createUser } from '../models/user.model';
+import { ErrorHandler } from '../utils/error.util';
 import asyncWrapper from '../utils/async-error.util';
+import { verify } from '../utils/jwt.util';
 
 export const signup = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // const regex = /^ [1-9]\\d {0,2}$/g;
     const schema = Joi.object({
       id: Joi.number().optional(),
-      activityId: Joi.string().optional(),
+      activityId: Joi.string().required(),
       username: Joi.string().min(3).max(30).required(),
       email: Joi.string()
         .email({
@@ -63,5 +65,33 @@ export const login = asyncWrapper(
       token,
       message: 'Login!',
     });
+  },
+);
+
+export const auth = asyncWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Check token
+    const isHeader: string | undefined = req.get('authorization');
+    const isAuthorize = isHeader?.startsWith('Bearer') ?? false;
+
+    let token: string | undefined;
+
+    if (isAuthorize) {
+      token = isHeader?.split(' ')[1];
+    }
+
+    if (token === undefined) {
+      next(
+        new ErrorHandler(
+          'You are not logged in! Please log in to get access',
+          401,
+        ),
+      );
+    }
+
+    // Verify token
+    const tokenDecoded = await verify(token);
+    console.log(tokenDecoded);
+    next();
   },
 );

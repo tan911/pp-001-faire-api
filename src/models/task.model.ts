@@ -7,20 +7,27 @@ interface Task {
   description: string;
 }
 
-export async function createTask(task: Task): Promise<void> {
+interface Taskable {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+}
+
+export async function createTask(task: Taskable): Promise<void> {
   try {
     await query(`
-     INSERT INTO user_activities (activity_id, title, description)
-      VALUES ('${task.activityId}', '${task.title}', '${task.description}')`);
+     INSERT INTO user_activities (id, title, description, status)
+      VALUES ('${task.id}', '${task.title}', '${task.description}', '${task.status}')`);
   } catch (err) {
     throw new ErrorHandler('An error occured when creating a task', 500);
   }
 }
 
-export async function getTask(id: string): Promise<Task> {
+export async function getTask(user: { id: string }): Promise<Task> {
   try {
     const response = await query(`SELECT * FROM user_activities WHERE
-      activity_id = '${id}'
+      id = '${user.id}'
     `);
     return response[0];
   } catch (err) {
@@ -28,21 +35,21 @@ export async function getTask(id: string): Promise<Task> {
   }
 }
 
-export async function updateTask(task: Task): Promise<void> {
+export async function updateTask(task: Taskable): Promise<void> {
   try {
     await query(`
-      UPDATE user_activities SET title = '${task.title}', description = '${task.description}'
-      WHERE activity_id = '${task.activityId}'
+      UPDATE user_activities SET title = '${task.title}', description = '${task.description}', status = '${task.status}'
+      WHERE id = '${task.id}'
     `);
   } catch (err) {
     throw new ErrorHandler('An error occured when updating a task', 500);
   }
 }
 
-export async function deleteTask(id: string): Promise<void> {
+export async function deleteTask(user: { id: string }): Promise<void> {
   try {
     await query(`
-      DELETE FROM user_activities WHERE activity_id = '${id}'
+      DELETE FROM user_activities WHERE id = '${user.id}'
     `);
   } catch (err) {
     throw new ErrorHandler('An error occured when deleting a task', 500);

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
+import logger from '../config/logger.config';
 import { query } from '../utils/query.util';
 import { ErrorHandler } from '../utils/error.util';
-import logger from '../config/logger.config';
 import { sign } from '../utils/jwt.util';
 import { getValueByKey, Is } from '../utils/helper.util';
 
@@ -43,7 +43,7 @@ export async function createUser(info: User): Promise<string> {
       error instanceof Error ? error.message : 'An error occured!';
 
     logger.error(error);
-    throw new ErrorHandler(errMessage, 500, error);
+    throw new ErrorHandler(errMessage, 403, error);
   }
 }
 

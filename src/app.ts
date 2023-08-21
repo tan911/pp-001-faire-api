@@ -19,8 +19,8 @@ app.use(appUrlencoded);
 app.use(appJSON);
 
 // ROUTES
-app.use('/faire/task', taskRouter);
 app.use('/faire/user', userRouter);
+app.use('/faire/user/task', taskRouter);
 
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
   next(new PageNotFound(req.originalUrl));
