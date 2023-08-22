@@ -90,7 +90,9 @@ export const auth = asyncWrapper(
     }
 
     // Verify token
-    const tokenDecoded = await verify(token);
+    const tokenDecoded: Record<string, unknown> | string = await verify(token);
+
+    // Check user if exist
     console.log(tokenDecoded);
     next();
   },

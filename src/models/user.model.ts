@@ -73,3 +73,16 @@ export async function checkUser(info: {
     throw new ErrorHandler(errMessage, 401, error);
   }
 }
+
+export async function isUser(email: string): Promise<string> {
+  try {
+    const user = await query(`
+      SELECT COUNT(activity_id) as user_id FROM user WHERE email = ${email} 
+     `);
+
+    return getValueByKey(user as [], 'user_id');
+  } catch (error) {
+    logger.error(error);
+    throw new ErrorHandler('An error occured', 500);
+  }
+}

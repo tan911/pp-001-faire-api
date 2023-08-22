@@ -26,7 +26,8 @@ export async function createTask(task: Taskable): Promise<void> {
 
 export async function getTask(user: { id: string }): Promise<Task> {
   try {
-    const response = await query(`SELECT * FROM user_activities WHERE
+    const response = await query(`
+    SELECT * FROM user_activities WHERE
       id = '${user.id}'
     `);
     return response[0];

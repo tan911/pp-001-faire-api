@@ -10,10 +10,12 @@ export async function sign(payload: Record<string, unknown>): Promise<string> {
   });
 }
 
-export async function verify(token: any): Promise<JwtPayload | string> {
+export async function verify(
+  token: string | undefined,
+): Promise<JwtPayload | string> {
   try {
     const decoded: JwtPayload | string = jwt.verify(
-      token,
+      token as string,
       process.env.JWT_SECRET_KEY as string,
     );
     return decoded;
