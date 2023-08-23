@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
-import { checkUser, createUser } from '../models/user.model';
+import { checkUser, createUser, isUser } from '../models/user.model';
 import { ErrorHandler } from '../utils/error.util';
 import asyncWrapper from '../utils/async-error.util';
 import { verify } from '../utils/jwt.util';
@@ -90,10 +90,18 @@ export const auth = asyncWrapper(
     }
 
     // Verify token
-    const tokenDecoded: Record<string, unknown> | string = await verify(token);
+    const decodedToken: Record<string, string> | string = await verify(token);
 
     // Check user if exist
-    console.log(tokenDecoded);
+    let isUserExist: string;
+
+    if (typeof decodedToken === 'string') {
+      isUserExist = await isUser(decodedToken);
+    } else {
+      isUserExist = await isUser(decodedToken.email);
+    }
+
+    console.log(isUserExist);
     next();
   },
 );

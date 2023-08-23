@@ -77,10 +77,10 @@ export async function checkUser(info: {
 export async function isUser(email: string): Promise<string> {
   try {
     const user = await query(`
-      SELECT COUNT(activity_id) as user_id FROM user WHERE email = ${email} 
+      SELECT email as user_email FROM user WHERE email = '${email}' 
      `);
 
-    return getValueByKey(user as [], 'user_id');
+    return getValueByKey(user as [], 'user_email');
   } catch (error) {
     logger.error(error);
     throw new ErrorHandler('An error occured', 500);
