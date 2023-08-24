@@ -53,15 +53,16 @@ export async function checkUser(info: {
 }): Promise<string> {
   try {
     const user = await query(`
-      SELECT email, password FROM user WHERE email = '${info.email}'
+      SELECT email, password, activity_id FROM user WHERE email = '${info.email}'
     `);
     const getPassword = getValueByKey(user as [], 'password');
+    const userId = getValueByKey(user as [], 'activity_id');
     const hashedPassword =
       getPassword === Is.NotExist ? Is.NotExist : getPassword;
     const isMatch = await bcrypt.compare(info.password, hashedPassword);
 
     if (isMatch) {
-      return await sign({ email: info.email });
+      return await sign({ id: userId });
     } else {
       throw new ErrorHandler('Incorrect email or password!', 401);
     }
@@ -74,13 +75,13 @@ export async function checkUser(info: {
   }
 }
 
-export async function isUser(email: string): Promise<string> {
+export async function isUser(id: string): Promise<string> {
   try {
     const user = await query(`
-      SELECT email as user_email FROM user WHERE email = '${email}' 
+      SELECT activity_id as user_id FROM user WHERE activity_id = '${id}' 
      `);
 
-    return getValueByKey(user as [], 'user_email');
+    return getValueByKey(user as [], 'user_id');
   } catch (error) {
     logger.error(error);
     throw new ErrorHandler('An error occured', 500);

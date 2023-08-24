@@ -5,6 +5,7 @@ import { checkUser, createUser, isUser } from '../models/user.model';
 import { ErrorHandler } from '../utils/error.util';
 import asyncWrapper from '../utils/async-error.util';
 import { verify } from '../utils/jwt.util';
+import { Is } from '../utils/helper.util';
 
 export const signup = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -83,7 +84,7 @@ export const auth = asyncWrapper(
     if (token === undefined) {
       next(
         new ErrorHandler(
-          'You are not logged in! Please log in to get access',
+          'You are not logged in! Please log in to get access.',
           401,
         ),
       );
@@ -98,10 +99,15 @@ export const auth = asyncWrapper(
     if (typeof decodedToken === 'string') {
       isUserExist = await isUser(decodedToken);
     } else {
-      isUserExist = await isUser(decodedToken.email);
+      isUserExist = await isUser(decodedToken.id);
     }
 
-    console.log(isUserExist);
+    if (isUserExist === Is.NotExist) {
+      next(new ErrorHandler('This user is no longer exist.', 401));
+    }
+
+    // Check if user changed password after token was issued
+    console.log(decodedToken);
     next();
   },
 );
