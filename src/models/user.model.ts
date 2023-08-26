@@ -50,7 +50,7 @@ export async function createUser(info: User): Promise<string> {
 export async function checkUser(info: {
   email: string;
   password: string;
-}): Promise<string> {
+}): Promise<Record<string, string>> {
   try {
     const user = await query(`
       SELECT email, password, activity_id FROM user WHERE email = '${info.email}'
@@ -60,8 +60,11 @@ export async function checkUser(info: {
     const hashedPassword =
       getPassword === Is.NotExist ? Is.NotExist : getPassword;
     const isMatch = await bcrypt.compare(info.password, hashedPassword);
+
     if (isMatch) {
-      return await sign({ id: userId, password: info.password });
+      const token = await sign({ id: userId, password: info.password });
+
+      return { id: userId, token: token };
     } else {
       throw new ErrorHandler('Incorrect email or password!', 401);
     }

@@ -40,7 +40,7 @@ export const getUserTask = asyncWrapper(
       id: Joi.string().required(),
     });
 
-    const userTask = await schema.validateAsync(req.params);
+    const userTask = await schema.validateAsync(req.body);
 
     const data = await getTask({
       id: userTask.id,

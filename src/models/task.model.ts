@@ -21,9 +21,14 @@ export async function createTask(task: Taskable): Promise<void> {
 export async function getTask(user: { id: string }): Promise<Taskable> {
   try {
     const response = await query(`
-    SELECT * FROM user_activities WHERE
-      id = '${user.id}'
+    SELECT ut.id, ut.title, ut.description,
+    ut.status, ut.created_at, ut.updated_at,
+    ut.completed_at
+    FROM user_activities as ut 
+    JOIN user ON user.activity_id = ut.id
+    WHERE ut.id = '${user.id}'
     `);
+
     return response[0];
   } catch (err) {
     throw new ErrorHandler('An error occured when getting a task', 500);

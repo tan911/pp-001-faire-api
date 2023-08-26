@@ -10,11 +10,7 @@ import { auth } from '../controllers/auth.controller';
 
 const router: Router = Router();
 
-router.route('/').post(createUserTask);
-router
-  .route('/:id')
-  .get(auth, getUserTask)
-  .patch(updateUserTask)
-  .delete(deleteUserTask);
+router.route('/').get(auth, getUserTask).post(createUserTask);
+router.route('/:id').patch(updateUserTask).delete(deleteUserTask);
 
 export default router;

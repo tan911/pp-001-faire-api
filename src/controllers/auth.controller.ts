@@ -57,15 +57,16 @@ export const login = asyncWrapper(
 
     const request = await schema.validateAsync(req.body);
 
-    const token = await checkUser({
+    const response: Record<string, string> = await checkUser({
       email: request.email as string,
       password: request.password as string,
     });
 
     res.status(200).json({
       status: 'success',
-      token,
-      message: 'Login!',
+      token: response.token,
+      id: response.id,
+      message: 'Logged In!',
     });
   },
 );
@@ -105,7 +106,8 @@ export const auth = asyncWrapper(
 
     if (
       isUserExist.id === Is.NotExist ||
-      isUserExist.password === Is.NotExist
+      isUserExist.password === Is.NotExist ||
+      isUserExist.id !== req.body.id
     ) {
       next(new ErrorHandler('This user is no longer exist.', 401));
     }
