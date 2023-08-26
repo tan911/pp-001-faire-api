@@ -3,7 +3,6 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logger = createLogger({
   level: 'verbose',
-  handleExceptions: true,
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({
@@ -24,7 +23,6 @@ const logger = createLogger({
     }),
     new winston.transports.Console(),
   ],
-  exitOnError: false,
 });
 
 export default logger;
