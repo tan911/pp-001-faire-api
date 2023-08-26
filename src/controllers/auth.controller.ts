@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import Joi from 'joi';
 
 import { checkUser, createUser, isUser } from '../models/user.model';
@@ -94,7 +95,7 @@ export const auth = asyncWrapper(
     const decodedToken: Record<string, string> | string = await verify(token);
 
     // Check user if exist
-    let isUserExist: string;
+    let isUserExist: Record<string, string>;
 
     if (typeof decodedToken === 'string') {
       isUserExist = await isUser(decodedToken);
@@ -102,12 +103,46 @@ export const auth = asyncWrapper(
       isUserExist = await isUser(decodedToken.id);
     }
 
-    if (isUserExist === Is.NotExist) {
+    if (
+      isUserExist.id === Is.NotExist ||
+      isUserExist.password === Is.NotExist
+    ) {
       next(new ErrorHandler('This user is no longer exist.', 401));
     }
 
-    // Check if user changed password after token was issued
-    console.log(decodedToken);
+    /**
+     * Check if user password changed
+     *
+     * This step is to verify if the user changed his password
+     * after the token was issued and also this is not relying
+     * on the date when a password was changed. However, it utilizes
+     * the bcrypt library comparison to ensure that, the password
+     * is modified or not.
+     */
+
+    let isPasswordChanged: boolean;
+
+    if (typeof decodedToken === 'string') {
+      isPasswordChanged = await bcrypt.compare(
+        decodedToken,
+        isUserExist.password,
+      );
+    } else {
+      isPasswordChanged = await bcrypt.compare(
+        decodedToken.password,
+        isUserExist.password,
+      );
+    }
+
+    if (!isPasswordChanged) {
+      next(
+        new ErrorHandler(
+          'Password has been changed! Please log in again.',
+          401,
+        ),
+      );
+    }
+
     next();
   },
 );

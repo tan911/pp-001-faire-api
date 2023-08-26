@@ -60,9 +60,8 @@ export async function checkUser(info: {
     const hashedPassword =
       getPassword === Is.NotExist ? Is.NotExist : getPassword;
     const isMatch = await bcrypt.compare(info.password, hashedPassword);
-
     if (isMatch) {
-      return await sign({ id: userId });
+      return await sign({ id: userId, password: info.password });
     } else {
       throw new ErrorHandler('Incorrect email or password!', 401);
     }
@@ -75,13 +74,15 @@ export async function checkUser(info: {
   }
 }
 
-export async function isUser(id: string): Promise<string> {
+export async function isUser(id: string): Promise<Record<string, string>> {
   try {
     const user = await query(`
-      SELECT activity_id as user_id FROM user WHERE activity_id = '${id}' 
+      SELECT activity_id as user_id, password as user_password FROM user WHERE activity_id = '${id}' 
      `);
+    const userId = getValueByKey(user as [], 'user_id');
+    const userPassword = getValueByKey(user as [], 'user_password');
 
-    return getValueByKey(user as [], 'user_id');
+    return { id: userId, password: userPassword };
   } catch (error) {
     logger.error(error);
     throw new ErrorHandler('An error occured', 500);

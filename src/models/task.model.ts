@@ -1,12 +1,6 @@
 import { query } from '../utils/query.util';
 import { ErrorHandler } from '../utils/error.util';
 
-interface Task {
-  activityId: string;
-  title: string;
-  description: string;
-}
-
 interface Taskable {
   id: string;
   title: string;
@@ -24,7 +18,7 @@ export async function createTask(task: Taskable): Promise<void> {
   }
 }
 
-export async function getTask(user: { id: string }): Promise<Task> {
+export async function getTask(user: { id: string }): Promise<Taskable> {
   try {
     const response = await query(`
     SELECT * FROM user_activities WHERE
