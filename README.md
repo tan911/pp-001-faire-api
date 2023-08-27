@@ -9,6 +9,6 @@ In progress
 - [x] CRUD task
 - [x] Login/Logout
 - [ ] Task completion
-- [ ] User registration
-- [ ] Token-Based authentication
+- [x] User registration
+- [x] Token-Based authentication
 - [ ] User data protection
