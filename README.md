@@ -6,7 +6,7 @@ Faire api is a basic RESTful API for managing a list of tasks or to-do items. It
 
 In progress
 
-- [ ] CRUD task
+- [x] CRUD task
 - [x] Login/Logout
 - [ ] Task completion
 - [ ] User registration
