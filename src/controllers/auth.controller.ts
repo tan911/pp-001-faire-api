@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Joi from 'joi';
 
-import { checkUser, createUser, isUser } from '../models/user.model';
+import { checkUser, createUser, isUser, isEmail } from '../models/user.model';
 import { ErrorHandler } from '../utils/error.util';
 import asyncWrapper from '../utils/async-error.util';
 import { verify } from '../utils/jwt.util';
@@ -146,5 +146,21 @@ export const auth = asyncWrapper(
     }
 
     next();
+  },
+);
+
+export const forgotPassword = asyncWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Get user based on POSTed email
+
+    const emailToken: string = await isEmail(req.body.email);
+
+    // Send it to user's email
+    console.log(emailToken);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'forgot password',
+    });
   },
 );
