@@ -16,7 +16,7 @@ interface User {
   password: string;
 }
 
-class UserExp {
+class UserModel {
   // HANDLE ERRORS
   private async errorWrapper<T>(operation: () => Promise<T>): Promise<T> {
     try {
@@ -171,4 +171,4 @@ class UserExp {
   }
 }
 
-export default new UserExp();
+export default new UserModel();
