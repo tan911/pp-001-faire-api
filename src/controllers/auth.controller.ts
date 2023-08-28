@@ -2,9 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Joi from 'joi';
 
-import { checkUser, createUser, isUser, isEmail } from '../models/user.model';
-import { ErrorHandler } from '../utils/error.util';
+// import { checkUser, createUser, isUser, isEmail } from '../models/user.model';
+import userschema from '../models/User.model';
 import asyncWrapper from '../utils/async-error.util';
+import { ErrorHandler } from '../utils/error.util';
 import { verify } from '../utils/jwt.util';
 import { Is } from '../utils/helper.util';
 
@@ -27,7 +28,7 @@ export const signup = asyncWrapper(
 
     const request = await schema.validateAsync(req.body);
 
-    const token = await createUser({
+    const token = await userschema.createUser({
       id: request.id,
       activityId: request.activityId,
       username: request.username,
@@ -57,7 +58,7 @@ export const login = asyncWrapper(
 
     const request = await schema.validateAsync(req.body);
 
-    const response: Record<string, string> = await checkUser({
+    const response: Record<string, string> = await userschema.checkUser({
       email: request.email as string,
       password: request.password as string,
     });
@@ -99,9 +100,9 @@ export const auth = asyncWrapper(
     let isUserExist: Record<string, string>;
 
     if (typeof decodedToken === 'string') {
-      isUserExist = await isUser(decodedToken);
+      isUserExist = await userschema.isUser(decodedToken);
     } else {
-      isUserExist = await isUser(decodedToken.id);
+      isUserExist = await userschema.isUser(decodedToken.id);
     }
 
     if (
@@ -153,7 +154,7 @@ export const forgotPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get user based on POSTed email
 
-    const emailToken: string = await isEmail(req.body.email);
+    const emailToken: string = await userschema.isEmail(req.body.email);
 
     // Send it to user's email
     console.log(emailToken);
