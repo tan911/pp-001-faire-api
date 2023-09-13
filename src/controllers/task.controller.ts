@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
-import {
-  createTask,
-  getTask,
-  updateTask,
-  deleteTask,
-} from '../models/task.model';
+// import {
+//   createTask,
+//   getTask,
+//   updateTask,
+//   deleteTask,
+// } from '../models/task.model';
+import taskSchema from '../models/Todo.model';
 import asyncWrapper from '../utils/async-error.util';
 
 export const createUserTask = asyncWrapper(
@@ -20,7 +21,7 @@ export const createUserTask = asyncWrapper(
 
     const request = await schema.validateAsync(req.body);
 
-    await createTask({
+    await taskSchema.createTask({
       id: request.id,
       title: request.title,
       description: request.description,
@@ -42,7 +43,7 @@ export const getUserTask = asyncWrapper(
 
     const userTask = await schema.validateAsync(req.body);
 
-    const data = await getTask({
+    const data = await taskSchema.getTask({
       id: userTask.id,
     });
 
@@ -66,7 +67,7 @@ export const updateUserTask = asyncWrapper(
 
     const request = await schema.validateAsync(req.body);
 
-    await updateTask({
+    await taskSchema.updateTask({
       id: request.id,
       title: request.title,
       description: request.description,
@@ -88,7 +89,7 @@ export const deleteUserTask = asyncWrapper(
 
     const user = await schema.validateAsync(req.params);
 
-    await deleteTask({
+    await taskSchema.deleteTask({
       id: user.id,
     });
 
