@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Joi from 'joi';
 
-// import { checkUser, createUser, isUser, isEmail } from '../models/user.model';
-import userschema from '../models/User.model';
+import userschema from '../models/Users.model';
 import asyncWrapper from '../utils/async-error.util';
+import sendEmail from '../utils/email.util';
 import { ErrorHandler } from '../utils/error.util';
 import { verify } from '../utils/jwt.util';
 import { Is } from '../utils/helper.util';
+import logger from '../config/logger.config';
 
 export const signup = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -154,14 +155,43 @@ export const forgotPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get user based on POSTed email
 
-    const emailToken: string = await userschema.isEmail(req.body.email);
+    const emailResetToken: string = await userschema.isEmail(req.body.email);
+    const host: string | undefined = req.get('host');
 
     // Send it to user's email
-    console.log(emailToken);
+    const resetURL = `${req.protocol}://${
+      host ?? ''
+    }/faire/users/resetPassword/${emailResetToken}`;
 
-    res.status(200).json({
-      status: 'success',
-      message: 'forgot password',
-    });
+    const message = `Forgot password? Submit a PATCH request with your new password and
+      password-confirm to: ${resetURL}.\n
+      If you didn't forget your password, please ignore this email!
+    `;
+
+    try {
+      await sendEmail({
+        email: req.body.email,
+        subject: 'Your password reset token (Valid for 10mins)',
+        message,
+      });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Token sent to email',
+      });
+    } catch (error) {
+      const resMessage = await userschema.isEmail(req.body.email, {
+        resetToken: 'undefined',
+        resetExpire: '0000-00-00 00:00:00',
+      });
+      logger.error(error);
+      next(new ErrorHandler(`${resMessage ?? 'error'} Try again later!`, 500));
+    }
+  },
+);
+
+export const resetPassword = asyncWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    //
   },
 );

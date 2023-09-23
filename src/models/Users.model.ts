@@ -58,9 +58,9 @@ class UserModel {
   }
 
   private async updateUserPasswordReset(
+    email: string,
     passwordResetToken: string,
     expiry: string,
-    email: string,
   ): Promise<void> {
     await query(`
         UPDATE user 
@@ -131,7 +131,10 @@ class UserModel {
   }
 
   // CHECK EMAIL FOR RESET PASSWORD FUNCTIONALITY
-  public async isEmail(email: string): Promise<string> {
+  public async isEmail(
+    email: string,
+    isError?: Record<string, string>,
+  ): Promise<string> {
     return await this.errorWrapper(async () => {
       const userEmail = await this.getUserByEmail(email);
 
@@ -140,7 +143,7 @@ class UserModel {
         'email',
       );
 
-      if (isUserEmail !== Is.NotExist) {
+      if (isUserEmail !== Is.NotExist && isError === undefined) {
         // generate the random reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         const passwordResetToken = crypto
@@ -158,9 +161,17 @@ class UserModel {
           .replace('T', ' ');
 
         // Store to db
-        await this.updateUserPasswordReset(passwordResetToken, expiry, email);
+        await this.updateUserPasswordReset(email, passwordResetToken, expiry);
 
         return resetToken;
+      } else if (isError !== undefined) {
+        await this.updateUserPasswordReset(
+          email,
+          isError.resetToken,
+          isError.resetExpire,
+        );
+
+        return 'There was an error sending the email.';
       } else {
         throw new ErrorHandler(
           'There is no user with this email address.',

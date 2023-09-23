@@ -1,12 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
-// import {
-//   createTask,
-//   getTask,
-//   updateTask,
-//   deleteTask,
-// } from '../models/task.model';
 import taskSchema from '../models/Todo.model';
 import asyncWrapper from '../utils/async-error.util';
 
