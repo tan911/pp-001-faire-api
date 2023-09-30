@@ -172,7 +172,9 @@ export const forgotPassword = asyncWrapper(
     try {
       await sendEmail({
         email: req.body.email,
-        subject: 'Your password reset token (Valid for 10mins)',
+        subject: `Your password reset token (Valid for ${
+          process.env.EMAIL_VALID_TIME as string
+        }mins)`,
         message,
       });
 
@@ -182,11 +184,16 @@ export const forgotPassword = asyncWrapper(
       });
     } catch (error) {
       const resMessage: string = await userschema.isEmail(req.body.email, {
-        resetToken: 'undefined',
-        resetExpire: '0000-00-00 00:00:00',
+        token: null,
+        expiry: null,
       });
       logger.error(error);
-      next(new ErrorHandler(`${resMessage ?? 'error'} Try again later!`, 500));
+      next(
+        new ErrorHandler(
+          `${resMessage ?? 'Email error.'} Try again later!`,
+          500,
+        ),
+      );
     }
   },
 );

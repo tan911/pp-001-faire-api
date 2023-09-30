@@ -43,7 +43,7 @@ class UserModel {
   }
 
   private async getUserById(id: string): Promise<RowDataPacket> {
-    return query(
+    return await query(
       ` SELECT activity_id, password 
         FROM user 
         WHERE activity_id = '${id}'`,
@@ -51,7 +51,7 @@ class UserModel {
   }
 
   private async getUserByEmail(email: string): Promise<RowDataPacket> {
-    return query(
+    return await query(
       ` SELECT email, password, activity_id 
         FROM user WHERE email = '${email}'`,
     );
@@ -59,15 +59,19 @@ class UserModel {
 
   private async updateUserPasswordReset(
     email: string,
-    passwordResetToken: string,
-    expiry: string,
+    passwordResetToken: string | null,
+    expiry: string | null,
   ): Promise<void> {
+    const isToken =
+      passwordResetToken !== null ? `'${passwordResetToken}'` : 'Null';
+    const isExpiry = expiry !== null ? `'${expiry}'` : 'Null';
+
     await query(`
-        UPDATE user 
-        SET password_reset_token = '${passwordResetToken}',
-        password_reset_request_time = '${expiry}'
-        WHERE email = '${email}'
-    `);
+          UPDATE user 
+          SET password_reset_token = ${isToken},
+          password_reset_request_time = ${isExpiry}
+          WHERE email = '${email}'
+        `);
   }
 
   // CREATE USER FOR SIGN UP FUNCTIONALITY
@@ -133,7 +137,7 @@ class UserModel {
   // CHECK EMAIL FOR RESET PASSWORD FUNCTIONALITY
   public async isEmail(
     email: string,
-    isError?: Record<string, string>,
+    isError?: Record<string, null>,
   ): Promise<string> {
     return await this.errorWrapper(async () => {
       const userEmail = await this.getUserByEmail(email);
@@ -151,10 +155,15 @@ class UserModel {
           .update(resetToken)
           .digest('hex');
 
-        // calculate the timestamp 10 mins from now
-        // this will set expiration for token
+        /**
+         * calculate the timestamp that depends
+         * on env configuration of valid time in minutes
+         * this will set a time as an expiration for token
+         */
         const now: Date = new Date();
-        const rawDate: Date = new Date(now.getTime() + 10 * 60 * 1000);
+        const rawDate: Date = new Date(
+          now.getTime() + Number(process.env.EMAIL_VALID_TIME) * 60 * 1000,
+        );
         const stringDate: string = rawDate.toISOString();
         const expiry: string = stringDate
           .slice(0, stringDate.length - 1)
@@ -165,11 +174,10 @@ class UserModel {
 
         return resetToken;
       } else if (isError !== undefined) {
-        console.log('called...============');
         await this.updateUserPasswordReset(
           email,
-          isError.resetToken,
-          isError.resetExpire,
+          isError.token,
+          isError.expiry,
         );
 
         return 'There was an error sending the email.';

@@ -36,7 +36,7 @@ class Task {
   }
 
   private async getTaskById(id: string): Promise<RowDataPacket> {
-    return query(`
+    return await query(`
       SELECT ut.id, ut.title, ut.description,
       ut.status, ut.created_at, ut.updated_at,
       ut.completed_at
