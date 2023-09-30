@@ -1,8 +1,8 @@
 import { RowDataPacket } from 'mysql2/promise';
 
-import { query } from '../utils/query.util';
-import { ErrorHandler } from '../utils/error.util';
-import logger from '../config/logger.config';
+import { query } from '@utils/query.util';
+import { ErrorHandler } from '@utils/error.util';
+import logger from '@config/logger.config';
 
 interface Taskable {
   id: string;
@@ -36,7 +36,7 @@ class Task {
   }
 
   private async getTaskById(id: string): Promise<RowDataPacket> {
-    return await query(`
+    return query(`
       SELECT ut.id, ut.title, ut.description,
       ut.status, ut.created_at, ut.updated_at,
       ut.completed_at

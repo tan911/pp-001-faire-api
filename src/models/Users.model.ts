@@ -2,11 +2,11 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { RowDataPacket } from 'mysql2/promise';
 
-import logger from '../config/logger.config';
-import { query } from '../utils/query.util';
-import { ErrorHandler } from '../utils/error.util';
-import { sign } from '../utils/jwt.util';
-import { getValueByKey, Is } from '../utils/helper.util';
+import logger from '@config/logger.config';
+import { query } from '@utils/query.util';
+import { ErrorHandler } from '@utils/error.util';
+import { sign } from '@utils/jwt.util';
+import { getValueByKey, Is } from '@utils/helper.util';
 
 interface User {
   id: number;
@@ -43,7 +43,7 @@ class UserModel {
   }
 
   private async getUserById(id: string): Promise<RowDataPacket> {
-    return await query(
+    return query(
       ` SELECT activity_id, password 
         FROM user 
         WHERE activity_id = '${id}'`,
@@ -51,7 +51,7 @@ class UserModel {
   }
 
   private async getUserByEmail(email: string): Promise<RowDataPacket> {
-    return await query(
+    return query(
       ` SELECT email, password, activity_id 
         FROM user WHERE email = '${email}'`,
     );
@@ -165,6 +165,7 @@ class UserModel {
 
         return resetToken;
       } else if (isError !== undefined) {
+        console.log('called...============');
         await this.updateUserPasswordReset(
           email,
           isError.resetToken,

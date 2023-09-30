@@ -1,4 +1,4 @@
-import { ErrorHandler } from '../utils/error.util';
+import { ErrorHandler } from '@utils/error.util';
 import logger from './logger.config';
 
 process.on('unhandledRejection', (error: Error) => {

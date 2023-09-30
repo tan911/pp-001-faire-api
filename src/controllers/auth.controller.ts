@@ -2,13 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Joi from 'joi';
 
-import userschema from '../models/Users.model';
-import asyncWrapper from '../utils/async-error.util';
-import sendEmail from '../utils/email.util';
-import { ErrorHandler } from '../utils/error.util';
-import { verify } from '../utils/jwt.util';
-import { Is } from '../utils/helper.util';
-import logger from '../config/logger.config';
+import userschema from '@models/Users.model';
+import asyncWrapper from '@utils/async-error.util';
+import sendEmail from '@utils/email.util';
+import { ErrorHandler } from '@utils/error.util';
+import { verify } from '@utils/jwt.util';
+import { Is } from '@utils/helper.util';
+import logger from '@config/logger.config';
 
 export const signup = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -151,6 +151,7 @@ export const auth = asyncWrapper(
   },
 );
 
+// TODO
 export const forgotPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get user based on POSTed email
@@ -180,7 +181,7 @@ export const forgotPassword = asyncWrapper(
         message: 'Token sent to email',
       });
     } catch (error) {
-      const resMessage = await userschema.isEmail(req.body.email, {
+      const resMessage: string = await userschema.isEmail(req.body.email, {
         resetToken: 'undefined',
         resetExpire: '0000-00-00 00:00:00',
       });

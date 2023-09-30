@@ -1,5 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import logger from '../config/logger.config';
+import logger from '@config/logger.config';
 import { ErrorHandler } from './error.util';
 
 export async function sign(payload: Record<string, unknown>): Promise<string> {

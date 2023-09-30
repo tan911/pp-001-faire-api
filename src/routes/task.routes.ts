@@ -5,8 +5,8 @@ import {
   getUserTask,
   updateUserTask,
   deleteUserTask,
-} from '../controllers/task.controller';
-import { auth } from '../controllers/auth.controller';
+} from '@controllers/task.controller';
+import { auth } from '@controllers/auth.controller';
 
 const router: Router = Router();
 

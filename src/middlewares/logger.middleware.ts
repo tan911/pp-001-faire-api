@@ -1,6 +1,5 @@
 import morgan, { StreamOptions } from 'morgan';
-// import { Request, Response } from 'express';
-import logger from '../config/logger.config';
+import logger from '@config/logger.config';
 
 const stream: StreamOptions = {
   write: message => logger.http(message),

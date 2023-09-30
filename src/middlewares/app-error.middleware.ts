@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorHandler } from 'utils/error.util';
-import logger from '../config/logger.config';
+import { ErrorHandler } from '@utils/error.util';
+import logger from '@config/logger.config';
 
 // eslint-disable-next-line
 export default (

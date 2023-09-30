@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
-import taskSchema from '../models/Todo.model';
-import asyncWrapper from '../utils/async-error.util';
+import taskSchema from '@models/Todo.model';
+import asyncWrapper from '@utils/async-error.util';
 
 export const createUserTask = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
