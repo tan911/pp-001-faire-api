@@ -7,6 +7,7 @@ import { query } from '@utils/query.util';
 import { ErrorHandler } from '@utils/error.util';
 import { sign } from '@utils/jwt.util';
 import { getValueByKey, Is } from '@utils/helper.util';
+import hashedToken from '@utils/crypto.util';
 
 interface User {
   id: number;
@@ -42,18 +43,20 @@ class UserModel {
     );
   }
 
-  private async getUserById(id: string): Promise<RowDataPacket> {
-    return await query(
-      ` SELECT activity_id, password 
-        FROM user 
-        WHERE activity_id = '${id}'`,
-    );
-  }
+  private async getUserType(
+    get: string[],
+    filterBy: string,
+    param: string | number,
+  ): Promise<RowDataPacket> {
+    const columns: string = get.reduce((acc, curr, index): string => {
+      if (index === 0) return curr;
+      return `${acc ?? ''}, ${curr ?? ''}`;
+    });
 
-  private async getUserByEmail(email: string): Promise<RowDataPacket> {
     return await query(
-      ` SELECT email, password, activity_id 
-        FROM user WHERE email = '${email}'`,
+      ` SELECT ${columns} 
+        FROM user 
+        WHERE ${filterBy} = '${param}'`,
     );
   }
 
@@ -81,7 +84,11 @@ class UserModel {
        * check if exist on records
        * to avoid duplicated ids
        */
-      const user = await this.getUserById(info.activityId);
+      const user = await this.getUserType(
+        ['activity_id', 'password'],
+        'activity_id',
+        info.activityId,
+      );
 
       const isId = getValueByKey(user as [], 'user_id');
 
@@ -105,7 +112,8 @@ class UserModel {
     password: string;
   }): Promise<Record<string, string>> {
     return await this.errorWrapper(async () => {
-      const user = await this.getUserByEmail(info.email);
+      const columns = ['email', 'password', 'activity_id'];
+      const user = await this.getUserType(columns, 'email', info.email);
 
       const getPassword = getValueByKey(user as [], 'password');
       const userId = getValueByKey(user as [], 'activity_id');
@@ -124,13 +132,33 @@ class UserModel {
   }
 
   // CHECK USER FOR PROTECTED ROUTES
-  public async isUser(id: string): Promise<Record<string, string>> {
+
+  // ========== bugs
+  public async isUser<T extends Record<string, string>>(
+    column: string[],
+    filter: string,
+    param: string | number,
+    isGetToken?: boolean,
+  ): Promise<T> {
     return await this.errorWrapper(async () => {
-      const user = await this.getUserById(id);
+      const user = await this.getUserType(column, filter, param);
       const userId = getValueByKey(user as [], 'activity_id');
       const userPassword = getValueByKey(user as [], 'password');
 
-      return { id: userId, password: userPassword };
+      if (isGetToken ?? false) {
+        const passwordToken = getValueByKey(user as [], 'password_reset_token');
+        const passwordTokenExpiry = getValueByKey(
+          user as [],
+          'password_reset_request_time',
+        );
+        console.log(user);
+        return {
+          password: passwordToken,
+          expiry: passwordTokenExpiry,
+        } as unknown as T;
+      }
+
+      return { id: userId, password: userPassword } as unknown as T;
     });
   }
 
@@ -140,7 +168,8 @@ class UserModel {
     isError?: Record<string, null>,
   ): Promise<string> {
     return await this.errorWrapper(async () => {
-      const userEmail = await this.getUserByEmail(email);
+      const columns = ['email', 'password', 'activity_id'];
+      const userEmail = await this.getUserType(columns, 'email', email);
 
       const isUserEmail: string | number = getValueByKey(
         userEmail as [],
@@ -150,14 +179,11 @@ class UserModel {
       if (isUserEmail !== Is.NotExist && isError === undefined) {
         // generate the random reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
-        const passwordResetToken = crypto
-          .createHash('sha256')
-          .update(resetToken)
-          .digest('hex');
+        const passwordResetToken = hashedToken(resetToken);
 
         /**
          * calculate the timestamp that depends
-         * on env configuration of valid time in minutes
+         * on env configuration of time
          * this will set a time as an expiration for token
          */
         const now: Date = new Date();

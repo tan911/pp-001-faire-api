@@ -9,6 +9,7 @@ import { ErrorHandler } from '@utils/error.util';
 import { verify } from '@utils/jwt.util';
 import { Is } from '@utils/helper.util';
 import logger from '@config/logger.config';
+import hashedToken from '@utils/crypto.util';
 
 export const signup = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -101,9 +102,17 @@ export const auth = asyncWrapper(
     let isUserExist: Record<string, string>;
 
     if (typeof decodedToken === 'string') {
-      isUserExist = await userschema.isUser(decodedToken);
+      isUserExist = await userschema.isUser(
+        ['activity_id', 'password'],
+        'activity_id',
+        decodedToken,
+      );
     } else {
-      isUserExist = await userschema.isUser(decodedToken.id);
+      isUserExist = await userschema.isUser(
+        ['activity_id', 'password'],
+        'activity_id',
+        decodedToken.id,
+      );
     }
 
     if (
@@ -151,7 +160,6 @@ export const auth = asyncWrapper(
   },
 );
 
-// TODO
 export const forgotPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get user based on POSTed email
@@ -198,8 +206,43 @@ export const forgotPassword = asyncWrapper(
   },
 );
 
+// TODO
+// bugs
 export const resetPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    //
+    //1) Get user based on the token
+    const reqToken: string = hashedToken(req.params.token);
+    const userToken = await userschema.isUser(
+      ['password_reset_token', 'password_reset_request_time'],
+      'password_reset_token',
+      reqToken,
+      true,
+    );
+
+    //2) if token has not expired, and there is user, set the new password
+    if (
+      userToken.password === Is.NotExist ||
+      userToken.expiry === Is.NotExist
+    ) {
+      next(new ErrorHandler('Token is invalid or has expired.', 400));
+    }
+
+    const now = new Date();
+    const expiry = new Date(userToken.expiry);
+    console.log(expiry);
+    // console.log(now);
+    const isTokenExpired = now.getTime() >= expiry.getTime();
+
+    if (isTokenExpired) {
+      next(new ErrorHandler('Token has expired.', 400));
+    }
+
+    //3) Update the password_reset_request_time
+
+    //4) Log the user in, send JWT
+    return res.status(200).json({
+      status: 'success',
+      message: userToken,
+    });
   },
 );
