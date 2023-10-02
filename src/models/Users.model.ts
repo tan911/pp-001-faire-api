@@ -63,11 +63,16 @@ class UserModel {
   private async updateUserPasswordReset(
     email: string,
     passwordResetToken: string | null,
-    expiry: string | null,
+    expiry?: string | null,
   ): Promise<void> {
     const isToken =
       passwordResetToken !== null ? `'${passwordResetToken}'` : 'Null';
-    const isExpiry = expiry !== null ? `'${expiry}'` : 'Null';
+    const isExpiry =
+      expiry === null
+        ? 'Null'
+        : `DATE_ADD(NOW(), INTERVAL ${Number(
+            process.env.EMAIL_VALID_TIME,
+          )} MINUTE)`;
 
     await query(`
           UPDATE user 
@@ -132,8 +137,6 @@ class UserModel {
   }
 
   // CHECK USER FOR PROTECTED ROUTES
-
-  // ========== bugs
   public async isUser<T extends Record<string, string>>(
     column: string[],
     filter: string,
@@ -151,7 +154,6 @@ class UserModel {
           user as [],
           'password_reset_request_time',
         );
-        console.log(user);
         return {
           password: passwordToken,
           expiry: passwordTokenExpiry,
@@ -181,22 +183,8 @@ class UserModel {
         const resetToken = crypto.randomBytes(32).toString('hex');
         const passwordResetToken = hashedToken(resetToken);
 
-        /**
-         * calculate the timestamp that depends
-         * on env configuration of time
-         * this will set a time as an expiration for token
-         */
-        const now: Date = new Date();
-        const rawDate: Date = new Date(
-          now.getTime() + Number(process.env.EMAIL_VALID_TIME) * 60 * 1000,
-        );
-        const stringDate: string = rawDate.toISOString();
-        const expiry: string = stringDate
-          .slice(0, stringDate.length - 1)
-          .replace('T', ' ');
-
         // Store to db
-        await this.updateUserPasswordReset(email, passwordResetToken, expiry);
+        await this.updateUserPasswordReset(email, passwordResetToken);
 
         return resetToken;
       } else if (isError !== undefined) {

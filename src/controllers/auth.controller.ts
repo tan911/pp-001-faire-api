@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Joi from 'joi';
+import moment from 'moment';
 
 import userschema from '@models/Users.model';
 import asyncWrapper from '@utils/async-error.util';
@@ -207,7 +208,6 @@ export const forgotPassword = asyncWrapper(
 );
 
 // TODO
-// bugs
 export const resetPassword = asyncWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     //1) Get user based on the token
@@ -227,22 +227,21 @@ export const resetPassword = asyncWrapper(
       next(new ErrorHandler('Token is invalid or has expired.', 400));
     }
 
-    const now = new Date();
-    const expiry = new Date(userToken.expiry);
-    console.log(expiry);
-    // console.log(now);
-    const isTokenExpired = now.getTime() >= expiry.getTime();
+    const now = moment();
+    const expiry = moment(userToken.expiry).format('YYYY-MM-DD HH:mm:ss');
+    const isTokenExpired: boolean = now.isAfter(expiry);
 
     if (isTokenExpired) {
       next(new ErrorHandler('Token has expired.', 400));
+    } else {
+      return res.status(200).json({
+        status: 'success',
+        message: userToken,
+      });
     }
 
     //3) Update the password_reset_request_time
 
     //4) Log the user in, send JWT
-    return res.status(200).json({
-      status: 'success',
-      message: userToken,
-    });
   },
 );
